@@ -19,20 +19,23 @@ def get_link(url=None):
 	Return:
 		href - site url
 	"""
-	response = urllib.request.urlopen(url)
-	html = response.read()
-	soup = BeautifulSoup(html, 'lxml')
-	# find infobox table
-	table = soup.find("table", { "class" : "infobox" })
-	# find in this table element with class url
-	th = table.find(True, {"class": "url"}) 
-	if not th:
-		# if class was not founded, find <a> with href and rel
-		th = soup.find("a", { "rel" : "nofollow" })
-	th_str = str(th)
-	# find in element link by regex
-	href = re.findall(r"href=\"(.+?)\"", th_str)
-	return href[0]
+	link = None
+	try:
+		response = urllib.request.urlopen(url)
+		html = response.read()
+		soup = BeautifulSoup(html, 'lxml')
+		# find infobox table
+		table = soup.find("table", { "class" : "infobox" })
+		# find in this table element with class url
+		th = table.find(True, {"class": "url"}) 
+		if not th:
+			# if class was not founded, find <a> with href and rel
+			th = soup.find("a", { "rel" : "nofollow" })
+		th_str = str(th)
+		# find in element link by regex
+		link = re.findall(r"href=\"(.+?)\"", th_str)[0]
+	finally:
+		return link
 
 def read_pages():
 	"""Read csv file and return all wikipedia pages.
